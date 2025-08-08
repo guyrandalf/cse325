@@ -1,0 +1,52 @@
+@using ConnectFour
+@inject GameState State
+@implements IDisposable
+
+<div class="move-history">
+    <h3>Move History (@State.MoveHistory.Count moves)</h3>
+    @if (State.MoveHistory.Count == 0)
+    {
+        <p class="no-moves">No moves yet. Start playing!</p>
+    }
+    else
+    {
+        <div class="moves-container">
+            @foreach (var move in State.MoveHistory)
+            {
+                <div class="move-item @GetPlayerClass(move.Player)">
+                    <span class="turn-number">@move.TurnNumber</span>
+                    <span class="player-indicator">Player @move.Player</span>
+                    <span class="move-details">Column @GetColumnLetter(move.Column), Row @move.Row</span>
+                    <span class="timestamp">@move.Timestamp.ToString("HH:mm:ss")</span>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        State.OnMoveAdded += StateChanged;
+    }
+
+    public void Dispose()
+    {
+        State.OnMoveAdded -= StateChanged;
+    }
+
+    private void StateChanged()
+    {
+        StateHasChanged();
+    }
+
+    private string GetPlayerClass(int player)
+    {
+        return player == 1 ? "player1-move" : "player2-move";
+    }
+
+    private string GetColumnLetter(int column)
+    {
+        return ((char)('A' + column)).ToString();
+    }
+}
